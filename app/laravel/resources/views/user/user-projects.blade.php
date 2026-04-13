@@ -1,0 +1,175 @@
+@section('query_placeholder', 'Search for a project...')
+@section('nav_projects_active', 'active')
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ asset('styles.css') }}" />
+  <title>Projects - Projecta</title>
+  <link rel="icon" type="image/x-icon" sizes="32x32" href="{{ asset('img/planet_logo_32x32.png') }}" />
+</head>
+
+<body>
+  @include('layouts.partials.navbar-client')
+
+
+  <header class="header">
+    <div class="client-welcome">Welcome, <strong>ACME Corp</strong></div>
+    <input type="text" placeholder="Search for a project..." />
+  </header>
+
+  <main>
+    <div class="page-header">
+      <h1 id="titleboard">Projects</h1>
+      <!-- <button class="btn-primary">+ New Project</button> -->
+      <a href="#projectModal" class="btn-primary">+ New Project</a>
+    </div>
+
+    <section class="projects-grid">
+      <div class="project-card">
+        <div class="project-status-tag">Active</div>
+        <div class="project-info">
+          <h2>Project 1</h2>
+        </div>
+        <div class="project-stats">
+          <div class="progress-container">
+            <div class="progress-labels">
+              <span>Contract Hours</span>
+              <span>35/50h</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 70%"></div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>8 Open Tickets</span>
+            <a href="{{ route('user.projects.show', 1) }}" class="btn-outline">View Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-status-tag">Active</div>
+        <div class="project-info">
+          <h2>Project 2</h2>
+        </div>
+        <div class="project-stats">
+          <div class="progress-container">
+            <div class="progress-labels">
+              <span>Contract Hours</span>
+              <span>102/100h</span>
+            </div>
+            <div class="progress-bar alert">
+              <div class="progress-fill warning" style="width: 100%"></div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>3 Open Tickets</span>
+            <a href="{{ route('user.projects.show', 2) }}" class="btn-outline">View Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-status-tag archived">archived</div>
+        <div class="project-info">
+          <h2>Project 3</h2>
+        </div>
+        <div class="project-stats">
+          <div class="progress-container">
+            <div class="progress-labels">
+              <span>Contract Hours</span>
+              <span>12/40h</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 30%"></div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>0 Open Ticket</span>
+            <a href="{{ route('user.projects.show', 3) }}" class="btn-outline">View Details</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-status-tag wait">Waiting for ticket</div>
+        <div class="project-info">
+          <h2>Project 4</h2>
+          <p class="client-name">Client: 4</p>
+        </div>
+        <div class="project-stats">
+          <div class="progress-container">
+            <div class="progress-labels">
+              <span>Contract Hours</span>
+              <span>12/40h</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 30%"></div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>0 Open Ticket</span>
+            <a href="{{ route('user.projects.show', 4) }}" class="btn-outline">View Details</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="projectModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create new project</h2>
+        <!-- <span class="close-modal">&times;</span> -->
+        <a href="#" class="close-modal">&times;</a>
+      </div>
+      <form id="createProjectForm">
+        <div class="form-group">
+          <label for="projectName">Project name</label>
+          <input type="text" id="projectName" placeholder="Ex: Design refactoring" required />
+          <div id="userProjectNameError" class="error-text titanic">
+            Project name must be at least 6 characters
+          </div>
+        </div>
+
+        <div class="form-group desc">
+          <label for="projectDesc">Project description</label>
+          <textarea name="projectDesc" id="projectDesc"
+            placeholder="Ex : A simple web redesign for our super useful website"></textarea>
+          <div id="userProjectDescError" class="error-text titanic">
+            Description must be at least 30 characters
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="projectClient">Client</label>
+          <input type="text" id="projectClient" value="ACME corp" readonly />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contractHours">Total Hours</label>
+            <input type="number" id="contractHours" placeholder="50" required />
+            <div id="userProjectHoursError" class="error-text titanic">
+              Minimum 5 hours required
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary close-modal">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary">Send Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="{{ asset('script.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+# Root env files
+.env
+.env.*
+!.env.example
+
+# Laravel env files
+app/laravel/.env
+app/laravel/.env.*
+!app/laravel/.env.example
+
+# Dependencies
+app/laravel/vendor/
+app/laravel/node_modules/
+
+# Laravel runtime / generated files
+app/laravel/public/storage
+app/laravel/storage/*.key
+app/laravel/bootstrap/cache/*.php
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
