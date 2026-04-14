@@ -16,10 +16,10 @@
 
 ## Phase 3 - Conteneurisation
 
-- [ ] Dockerfile PHP / Laravel
-- [ ] Configuration Nginx
-- [ ] Service PostgreSQL
-- [ ] docker-compose.yml initial
+- [x] Dockerfile PHP / Laravel
+- [x] Configuration Nginx
+- [x] Service PostgreSQL
+- [x] docker-compose.yml initial
 - [ ] Tests applicatifs
 
 ## Phase 4 - Monitoring
