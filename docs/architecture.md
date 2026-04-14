@@ -21,23 +21,88 @@ Mettre à disposition une application Laravel dans un mini environnement de prod
 - déploiement reproductible via Docker Compose
 - documentation d’exploitation minimale
 
-## Phase 3 - Architecture conteneurisée initiale
+## Objectif de la phase 3
 
-Services :
+Construire une première architecture conteneurisée simple, cohérente et présentable pour une application Laravel.
 
-- nginx : exposition HTTP, reverse proxy vers PHP-FPM
-- app : conteneur Laravel / PHP-FPM
-- db : PostgreSQL
+## Vue d’ensemble
 
-Flux :
+La stack repose sur trois services principaux :
 
-- client -> nginx:80
-- nginx -> app:9000
-- app -> db:5432
+- `nginx` : point d’entrée HTTP
+- `app` : exécution Laravel via PHP-FPM
+- `db` : base de données PostgreSQL
 
-Principes :
+## Flux
 
-- séparation des rôles par service
-- communication interne via réseau Docker Compose
-- persistance des données PostgreSQL via volume Docker
-- code applicatif monté ou copié dans le conteneur app selon le besoin
+```text
+Navigateur
+    |
+    v
+Nginx (port 80)
+    |
+    v
+PHP-FPM / Laravel (port 9000 en interne)
+    |
+    v
+PostgreSQL (port 5432 en interne)
+```
+
+## Rôle des composants
+
+### Nginx
+
+Nginx sert de frontal HTTP.
+Il reçoit les requêtes web, sert les fichiers publics et transmet les requêtes PHP à PHP-FPM.
+
+### App
+
+Le service `app` contient l’application Laravel et PHP-FPM.
+Il exécute le code applicatif et dialogue avec PostgreSQL.
+
+### PostgreSQL
+
+Le service `db` fournit la persistance des données.
+Il remplace l’ancien fonctionnement local basé sur SQLite.
+
+## Réseau
+
+Les services communiquent via le réseau Docker Compose.
+Les noms de services (`app`, `db`) servent de points de communication internes.
+
+## Volumes et persistance
+
+La base PostgreSQL doit reposer sur un volume Docker pour conserver les données entre redémarrages.
+Les fichiers de l’application sont montés ou copiés dans le conteneur `app` selon le choix d’implémentation retenu.
+
+## Choix techniques
+
+### Séparation Nginx / PHP-FPM
+
+Le serveur web et l’exécution PHP sont séparés pour refléter une architecture web classique et maintenable.
+
+### PostgreSQL
+
+Le projet migre de SQLite vers PostgreSQL afin de se rapprocher d’un usage plus réaliste côté production et exploitation.
+
+### Docker Compose
+
+Docker Compose permet de décrire la stack, de la relancer facilement et de garder un environnement reproductible sur la VM.
+
+## État de la phase
+
+Phase 3 terminée :
+
+- stack conteneurisée opérationnelle
+- communication entre services validée
+- application accessible
+- base initialisée
+- seeders exécutés
+
+## Extension prévue
+
+Les composants suivants sont prévus pour la suite mais non implémentés dans cette phase :
+
+- Prometheus
+- Grafana
+- node_exporter
