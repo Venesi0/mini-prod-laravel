@@ -20,3 +20,24 @@ Mettre à disposition une application Laravel dans un mini environnement de prod
 - persistance des données PostgreSQL via volume Docker
 - déploiement reproductible via Docker Compose
 - documentation d’exploitation minimale
+
+## Phase 3 - Architecture conteneurisée initiale
+
+Services :
+
+- nginx : exposition HTTP, reverse proxy vers PHP-FPM
+- app : conteneur Laravel / PHP-FPM
+- db : PostgreSQL
+
+Flux :
+
+- client -> nginx:80
+- nginx -> app:9000
+- app -> db:5432
+
+Principes :
+
+- séparation des rôles par service
+- communication interne via réseau Docker Compose
+- persistance des données PostgreSQL via volume Docker
+- code applicatif monté ou copié dans le conteneur app selon le besoin

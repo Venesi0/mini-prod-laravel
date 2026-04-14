@@ -23,8 +23,8 @@ Construire un projet crédible et défendable en entretien pour une alternance e
 
 ## Phases
 
-1. Préparation de l’hôte Ubuntu et installation Docker
-2. Structure du repo et mise en place Git/GitHub
+1. Préparation de l’hôte Ubuntu et installation Docker (done)
+2. Structure du repo et mise en place Git/GitHub (done)
 3. Conteneurisation Laravel / Nginx / PostgreSQL
 4. Monitoring
 5. Documentation d’exploitation

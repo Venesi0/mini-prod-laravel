@@ -8,11 +8,11 @@
 
 ## Phase 2 - Structure du projet
 
-- [ ] Création du repo principal
-- [ ] Import de l’application Laravel
-- [ ] Création du dépôt GitHub
-- [ ] Push initial
-- [ ] Clone sur Ubuntu Server
+- [x] Création du repo principal
+- [x] Import de l’application Laravel
+- [x] Création du dépôt GitHub
+- [x] Push initial
+- [x] Clone sur Ubuntu Server
 
 ## Phase 3 - Conteneurisation
 
