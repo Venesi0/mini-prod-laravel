@@ -298,6 +298,21 @@ docker compose -f infra/compose/docker-compose.yml logs --tail=100 app
 docker compose -f infra/compose/docker-compose.yml exec app php artisan about
 ```
 
+### Réparation du runtime Laravel
+
+En cas d'erreur 500 liée au cache, aux sessions, aux vues compilées ou aux permissions de `storage` / `bootstrap/cache`, exécuter :
+
+```bash
+./scripts/fix-laravel-runtime.sh
+```
+
+Ce script :
+- recrée les répertoires runtime manquants ;
+- remet les permissions nécessaires au processus web ;
+- nettoie les caches runtime ;
+- relance les commandes Laravel de nettoyage ;
+- termine par un healthcheck.
+
 ### Cas 4 : base de données indisponible
 
 Hypothèses :
@@ -366,6 +381,21 @@ Les scripts dans `scripts/` simplifient les opérations courantes.
 ```bash
 cat scripts/up.sh
 ```
+
+### Scripts utilitaires
+
+| Script                             | Usage      | Action                     |
+|------------------------------------|------------|----------------------------|
+| `./scripts/up.sh`                  | Démarrage  | Lance stack + affiche URLs |
+| `./scripts/healthcheck.sh`         | Contrôle   | Vérifie santé complète     |
+| `./scripts/fix-laravel-runtime.sh` | Erreur 500 | Répare runtime Laravel     |
+| `./scripts/fix-git-permissions.sh` | Git bloqué | Remet permissions pour Git |
+
+### Workflow typique après intervention
+./scripts/fix-laravel-runtime.sh # Répare Laravel
+./scripts/healthcheck.sh # Vérifie
+./scripts/fix-git-permissions.sh # Git OK
+git pull --rebase origin main # Sync GitHub
 
 ## Annexe - Commandes rapides
 
