@@ -99,6 +99,17 @@ Phase 3 terminée :
 - base initialisée
 - seeders exécutés
 
+## Stabilisation d'exploitation
+
+À l'issue de la phase 4, l'architecture applicative de base (`nginx` / `app` / `db`) est considérée comme stabilisée pour l'exploitation courante :
+
+- démarrage, arrêt et redémarrage documentés ;
+- contrôles de santé formalisés ;
+- scripts utilitaires d'exploitation ajoutés ;
+- correction structurelle du runtime Laravel intégrée au démarrage du conteneur `app`.
+
+L'étape suivante n'est pas une refonte de la stack applicative, mais l'ajout de briques d'observabilité.
+
 ## Extension prévue
 
 Les composants suivants sont prévus pour la suite mais non implémentés dans cette phase :

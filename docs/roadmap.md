@@ -1,6 +1,6 @@
 # Roadmap
 
-## Phase 1 - Hôte Ubuntu / Docker
+## ✅ Phase 1 - Hôte Ubuntu / Docker
 
 Statut : terminé
 
@@ -8,7 +8,7 @@ Statut : terminé
 - [x] Docker installé
 - [x] Test `docker run hello-world`
 
-## Phase 2 - Structure du projet
+## ✅ Phase 2 - Structure du projet
 
 Statut : terminé
 
@@ -18,7 +18,7 @@ Statut : terminé
 - [x] Push initial
 - [x] Clone sur Ubuntu Server
 
-## Phase 3 - Conteneurisation applicative
+## ✅ Phase 3 - Conteneurisation applicative
 
 Statut : terminé
 
@@ -33,16 +33,16 @@ Statut : terminé
 
 ## ✅ Phase 4 - Stabilisation exploitation et runbook (terminée)
 
-**Livraison** : 15 avril 2026
-
-- [x] Runbook d'exploitation complet
-- [x] Procédures lancement/arrêt/redémarrage documentées
-- [x] Vérifications de santé (conteneurs/HTTP/PostgreSQL)
-- [x] Diagnostics pannes courantes (502/500/DB)
-- [x] Nettoyage Git : suppression suivi runtime Laravel
-- [x] Structure .gitignore standard Laravel
-- [x] Scripts utilitaires d'exploitation (+x)
-- [x] Ownership projet corrigé sur VM
+- [x] Runbook d'exploitation structuré et consolidé
+- [x] Procédures de lancement / arrêt / redémarrage documentées
+- [x] Vérifications de santé Docker / HTTP / PostgreSQL documentées
+- [x] Logs utiles et diagnostics de premier niveau formalisés
+- [x] Scripts d'exploitation ajoutés : `up.sh`, `down.sh`, `healthcheck.sh`
+- [x] Script de remédiation ajouté : `fix-laravel-runtime.sh`
+- [x] Script de maintenance locale ajouté : `fix-git-permissions.sh`
+- [x] Incident HTTP 500 analysé et documenté
+- [x] Correction structurelle du runtime Laravel intégrée via entrypoint
+- [x] Préparation de la phase 5 monitoring sans implémentation immédiate
 
 ## Phase 5 - Monitoring
 

@@ -21,7 +21,7 @@ La VM Ubuntu Server sert d’hôte de déploiement et de validation d’exploita
 
 ## État actuel
 
-Phase 3 terminée :
+Phase 4 terminée :
 
 - application Laravel importée dans `app/laravel/`
 - image PHP-FPM dédiée construite pour l’application
@@ -31,6 +31,10 @@ Phase 3 terminée :
 - stack lancée et validée
 - accès à l’application via la VM
 - base initialisée et seeders exécutés
+- runbook d’exploitation rédigé et consolidé
+- scripts d’exploitation ajoutés (`up.sh`, `down.sh`, `healthcheck.sh`)
+- incident runtime Laravel analysé et corrigé
+- entrypoint de démarrage ajouté pour fiabiliser `storage/` et `bootstrap/cache`
 
 ## Structure du projet
 
@@ -60,7 +64,13 @@ scripts/               scripts utilitaires
 Depuis la racine du projet :
 
 ```bash
-docker compose -f infra/compose/docker-compose.yml up -d --build
+./scripts/up.sh
+```
+
+Ou en commande longue :
+
+```bash
+docker compose -f infra/compose/docker-compose.yml up -d
 ```
 
 Vérifier l’état des conteneurs :
@@ -71,12 +81,28 @@ docker compose -f infra/compose/docker-compose.yml ps
 
 ## Commandes utiles
 
-Vider les caches Laravel :
+Contrôle rapide de la stack :
 
 ```bash
-docker compose -f infra/compose/docker-compose.yml exec app php artisan config:clear
-docker compose -f infra/compose/docker-compose.yml exec app php artisan route:clear
-docker compose -f infra/compose/docker-compose.yml exec app php artisan view:clear
+./scripts/healthcheck.sh
+```
+
+Arrêt propre :
+
+```bash
+./scripts/down.sh
+```
+
+Réparation du runtime Laravel en cas d'erreur 500 :
+
+```bash
+./scripts/fix-laravel-runtime.sh
+```
+
+Remise des permissions locales pour les opérations Git sur la VM :
+
+```bash
+./scripts/fix-git-permissions.sh
 ```
 
 Lancer les migrations :
@@ -103,6 +129,5 @@ Le monitoring, l’observabilité, l’automatisation de déploiement et le durc
 
 ## Suite prévue
 
-- Phase 4 : stabilisation exploitation et runbook
 - Phase 5 : monitoring avec Prometheus / Grafana / node_exporter
 - Phase 6 : amélioration de la qualité de déploiement et de la documentation d’exploitation

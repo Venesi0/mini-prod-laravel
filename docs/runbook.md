@@ -16,7 +16,8 @@ Ce runbook couvre uniquement l'exploitation courante :
 - redémarrage ;
 - vérifications de santé ;
 - consultation des logs ;
-- premiers diagnostics en cas d'incident.
+- premiers diagnostics en cas d'incident ;
+- usage des scripts utilitaires d'exploitation.
 
 Il ne couvre pas :
 
@@ -38,15 +39,18 @@ Il ne couvre pas :
 - `app/laravel/` : code applicatif Laravel
 - `infra/compose/` : orchestration Docker Compose
 - `infra/nginx/` : configuration Nginx
-- `infra/php/` : image et configuration PHP
+- `infra/php/` : image, Dockerfile et entrypoint PHP
 - `infra/postgres/` : éléments liés à PostgreSQL
 - `docs/` : documentation projet
 - `scripts/` : scripts utilitaires d'exploitation
 
 ### Fichier Compose de référence
 
-Toutes les commandes d'exploitation utilisent le fichier :
-`infra/compose/docker-compose.yml`
+Toutes les commandes d'exploitation utilisent :
+
+```bash
+infra/compose/docker-compose.yml
+```
 
 ## 3. Prérequis d'exploitation
 
@@ -73,6 +77,19 @@ docker compose version
 docker compose -f infra/compose/docker-compose.yml up -d
 ```
 
+### Démarrage via script
+
+```bash
+./scripts/up.sh
+```
+
+Le script `up.sh` :
+
+- lance la stack ;
+- affiche l'état des services ;
+- affiche l'URL locale `http://localhost` ;
+- affiche l'URL réseau de la VM si elle est détectée automatiquement.
+
 ### Vérification immédiate après démarrage
 
 ```bash
@@ -91,6 +108,12 @@ Résultat attendu :
 
 ```bash
 docker compose -f infra/compose/docker-compose.yml stop
+```
+
+### Arrêt via script
+
+```bash
+./scripts/down.sh
 ```
 
 Usage :
@@ -113,7 +136,7 @@ Usage :
 
 Attention :
 
-- ne pas utiliser cette commande sans raison si l'objectif est seulement de stopper temporairement l'environnement ;
+- ne pas utiliser `down` sans raison si l'objectif est seulement de stopper temporairement l'environnement ;
 - bien distinguer `stop` et `down`.
 
 ## 6. Redémarrage de la stack
@@ -140,6 +163,18 @@ Usage :
 
 ## 7. Vérifications de santé
 
+### Contrôle rapide via script
+
+```bash
+./scripts/healthcheck.sh
+```
+
+Le script vérifie :
+
+- l'état Docker Compose ;
+- la réponse HTTP ;
+- la disponibilité PostgreSQL.
+
 ### État global des conteneurs
 
 ```bash
@@ -152,19 +187,7 @@ docker compose -f infra/compose/docker-compose.yml ps
 - statut `Up` ;
 - pas de redémarrages répétés.
 
-### Vérification des logs récents
-
-```bash
-docker compose -f infra/compose/docker-compose.yml logs --tail=50
-```
-
-### Vérification de l'accès HTTP via Nginx
-
-```bash
-curl -I http://localhost
-
-curl -I http://IP_DE_LA_VM
-```
+### Vérification HTTP
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost
@@ -178,38 +201,12 @@ Interprétation simple :
 - `500` : suspicion d'erreur applicative côté Laravel ;
 - absence de réponse : suspicion sur Nginx ou sur l'exposition du service.
 
-À vérifier :
+### Vérification depuis le réseau local
 
-- réponse HTTP cohérente ;
-- absence d'erreur 502 ou 500.
-
-### HTTP 200
-
-- le frontal répond correctement ;
-- la stack est au moins partiellement opérationnelle.
-
-### HTTP 502
-
-- Nginx répond mais n'arrive pas à joindre correctement l'application ;
-- vérifier prioritairement `app` et la configuration Nginx.
-
-### HTTP 500
-
-- l'application répond avec une erreur interne ;
-- vérifier prioritairement les logs Laravel / PHP.
-
-### PostgreSQL indisponible
-
-- l'application peut devenir partiellement ou totalement inutilisable ;
-- vérifier `db`, puis la configuration de connexion applicative.
-
-### Vérification applicative Laravel
-
-Adapter selon la page disponible :
+Adapter selon l'IP courante de la VM :
 
 ```bash
-curl http://localhost
-
+curl -I http://IP_DE_LA_VM
 curl http://IP_DE_LA_VM
 ```
 
@@ -288,6 +285,7 @@ Hypothèses :
 
 - variable d'environnement incorrecte ;
 - cache Laravel incohérent ;
+- permissions incorrectes sur `storage` ou `bootstrap/cache` ;
 - problème d'accès base de données ;
 - erreur interne de l'application.
 
@@ -296,6 +294,7 @@ Commandes utiles :
 ```bash
 docker compose -f infra/compose/docker-compose.yml logs --tail=100 app
 docker compose -f infra/compose/docker-compose.yml exec app php artisan about
+docker compose -f infra/compose/docker-compose.yml exec app sh -lc 'ls -ld storage storage/logs storage/framework storage/framework/cache storage/framework/cache/data storage/framework/sessions storage/framework/views bootstrap/cache'
 ```
 
 ### Réparation du runtime Laravel
@@ -307,11 +306,29 @@ En cas d'erreur 500 liée au cache, aux sessions, aux vues compilées ou aux per
 ```
 
 Ce script :
+
 - recrée les répertoires runtime manquants ;
 - remet les permissions nécessaires au processus web ;
 - nettoie les caches runtime ;
 - relance les commandes Laravel de nettoyage ;
 - termine par un healthcheck.
+
+### Correction structurelle en place
+
+Le conteneur `app` utilise désormais un entrypoint personnalisé :
+
+- `infra/php/docker-entrypoint.sh`
+
+Son rôle est de :
+
+- créer les répertoires runtime Laravel au démarrage ;
+- remettre les permissions nécessaires sur `storage` et `bootstrap/cache` ;
+- nettoyer les caches Laravel ;
+- lancer ensuite `php-fpm`.
+
+Objectif :
+
+- éviter les erreurs 500 récurrentes après redémarrage de la stack.
 
 ### Cas 4 : base de données indisponible
 
@@ -329,15 +346,38 @@ docker compose -f infra/compose/docker-compose.yml logs --tail=100 db
 docker compose -f infra/compose/docker-compose.yml exec db pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
 ```
 
-## 10. Principes d'exploitation retenus
+## 10. Scripts utilitaires
+
+Les scripts dans `scripts/` simplifient les opérations courantes.
+
+### Scripts disponibles
+
+| Script                             | Usage              | Action                                                          |
+| ---------------------------------- | ------------------ | --------------------------------------------------------------- |
+| `./scripts/up.sh`                  | Démarrage          | Lance la stack, affiche l'état Compose et les URL d'accès       |
+| `./scripts/down.sh`                | Arrêt              | Stoppe proprement la stack                                      |
+| `./scripts/healthcheck.sh`         | Contrôle           | Vérifie conteneurs, HTTP et PostgreSQL                          |
+| `./scripts/fix-laravel-runtime.sh` | Remédiation        | Répare le runtime Laravel en cas d'erreur 500                   |
+| `./scripts/fix-git-permissions.sh` | Maintenance locale | Redonne la main à l'utilisateur système pour les opérations Git |
+
+### Workflow typique après incident Laravel
+
+```bash
+./scripts/fix-laravel-runtime.sh
+./scripts/healthcheck.sh
+./scripts/fix-git-permissions.sh
+git pull --rebase origin main
+```
+
+## 11. Principes d'exploitation retenus
 
 - garder les commandes simples et explicites ;
-- éviter l'automatisation inutile à ce stade ;
-- distinguer clairement lancement, arrêt, redémarrage et diagnostic ;
+- distinguer clairement lancement, arrêt, contrôle et remédiation ;
 - privilégier les vérifications observables ;
+- documenter les incidents réels rencontrés ;
 - préparer une exploitation lisible avant d'ajouter du monitoring.
 
-## 11. Suite prévue
+## 12. Suite prévue
 
 La phase suivante portera sur l'observabilité et le monitoring :
 
@@ -346,64 +386,3 @@ La phase suivante portera sur l'observabilité et le monitoring :
 - node_exporter.
 
 Cette phase ne sera engagée qu'une fois l'exploitation courante stabilisée et documentée.
-
-## 12. Scripts utilitaires
-
-Les scripts dans `scripts/` simplifient les opérations courantes.
-
-### Usage des scripts
-
-```bash
-# Lancement (équivalent up -d)
-./scripts/up.sh
-
-# Arrêt propre (équivalent stop)
-./scripts/down.sh
-
-# Vérifications santé
-./scripts/healthcheck.sh
-```
-
-### Contenu des scripts
-
-**`up.sh`** : `docker compose -f infra/compose/docker-compose.yml up -d`
-**`down.sh`** : `docker compose -f infra/compose/docker-compose.yml stop`
-**`healthcheck.sh`** : enchaîne `ps`, `curl -I`, `pg_isready`
-
-### Avantages
-
-- raccourcis mémorisables
-- commandes testées et validées
-- exécutables (+x) et versionnés Git
-
-**Précaution** : toujours vérifier le contenu avant exécution :
-
-```bash
-cat scripts/up.sh
-```
-
-### Scripts utilitaires
-
-| Script                             | Usage      | Action                     |
-|------------------------------------|------------|----------------------------|
-| `./scripts/up.sh`                  | Démarrage  | Lance stack + affiche URLs |
-| `./scripts/healthcheck.sh`         | Contrôle   | Vérifie santé complète     |
-| `./scripts/fix-laravel-runtime.sh` | Erreur 500 | Répare runtime Laravel     |
-| `./scripts/fix-git-permissions.sh` | Git bloqué | Remet permissions pour Git |
-
-### Workflow typique après intervention
-./scripts/fix-laravel-runtime.sh # Répare Laravel
-./scripts/healthcheck.sh # Vérifie
-./scripts/fix-git-permissions.sh # Git OK
-git pull --rebase origin main # Sync GitHub
-
-## Annexe - Commandes rapides
-
-| Action   | Commande longue            | Script                     |
-| -------- | -------------------------- | -------------------------- |
-| Démarrer | `docker compose ... up -d` | `./scripts/up.sh`          |
-| Arrêter  | `docker compose ... stop`  | `./scripts/down.sh`        |
-| Santé    | `docker compose ps + curl` | `./scripts/healthcheck.sh` |
-| Logs     | `docker compose logs -f`   | `docker compose logs -f`   |
-
-**Fin du runbook**
