@@ -16,4 +16,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/app
 
+
+# Entrypoint personnalisé pour initialiser Laravel
+COPY infra/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
