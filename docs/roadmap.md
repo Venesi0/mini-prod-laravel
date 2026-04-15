@@ -13,7 +13,7 @@ Statut : terminé
 Statut : terminé
 
 - [x] Création du repo principal
-- [x] Import de l’application Laravel
+- [x] Import de l'application Laravel
 - [x] Création du dépôt GitHub
 - [x] Push initial
 - [x] Clone sur Ubuntu Server
@@ -22,26 +22,36 @@ Statut : terminé
 
 Statut : terminé
 
-- [x] définition de l’architecture cible
-- [x] création du conteneur Laravel / PHP-FPM
-- [x] configuration Nginx
-- [x] création de la stack Docker Compose
-- [x] adaptation des variables d’environnement
-- [x]lancement de la stack
-- [x] diagnostic et correction des erreurs initiales
-- [x]migration vers PostgreSQL
-- [x]exécution des seeders
-- [x]mise à jour de la documentation
+- [x] Définition de l'architecture cible
+- [x] Création du conteneur Laravel/PHP-FPM
+- [x] Configuration Nginx
+- [x] Création de la stack Docker Compose
+- [x] Adaptation des variables d'environnement
+- [x] Lancement de la stack
+- [x] Migration vers PostgreSQL
+- [x] Exécution des seeders
 
-## Phase 4 - Monitoring
+## ✅ Phase 4 - Stabilisation exploitation et runbook (terminée)
+
+**Livraison** : 15 avril 2026
+
+- [x] Runbook d'exploitation complet
+- [x] Procédures lancement/arrêt/redémarrage documentées
+- [x] Vérifications de santé (conteneurs/HTTP/PostgreSQL)
+- [x] Diagnostics pannes courantes (502/500/DB)
+- [x] Nettoyage Git : suppression suivi runtime Laravel
+- [x] Structure .gitignore standard Laravel
+- [x] Scripts utilitaires d'exploitation (+x)
+- [x] Ownership projet corrigé sur VM
+
+## Phase 5 - Monitoring
 
 - [ ] Prometheus
 - [ ] Grafana
 - [ ] node_exporter
 
-## Phase 5 - Documentation
+## Phase 6 - Documentation finale
 
 - [ ] README enrichi
-- [ ] Runbook
-- [ ] Schéma d’architecture
-- [ ] Explication des choix techniques
+- [ ] Schéma d'architecture visuel
+- [ ] Portfolio-ready

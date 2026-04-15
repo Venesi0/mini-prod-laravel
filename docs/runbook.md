@@ -331,3 +331,49 @@ La phase suivante portera sur l'observabilité et le monitoring :
 - node_exporter.
 
 Cette phase ne sera engagée qu'une fois l'exploitation courante stabilisée et documentée.
+
+## 12. Scripts utilitaires
+
+Les scripts dans `scripts/` simplifient les opérations courantes.
+
+### Usage des scripts
+
+```bash
+# Lancement (équivalent up -d)
+./scripts/up.sh
+
+# Arrêt propre (équivalent stop)
+./scripts/down.sh
+
+# Vérifications santé
+./scripts/healthcheck.sh
+```
+
+### Contenu des scripts
+
+**`up.sh`** : `docker compose -f infra/compose/docker-compose.yml up -d`
+**`down.sh`** : `docker compose -f infra/compose/docker-compose.yml stop`
+**`healthcheck.sh`** : enchaîne `ps`, `curl -I`, `pg_isready`
+
+### Avantages
+
+- raccourcis mémorisables
+- commandes testées et validées
+- exécutables (+x) et versionnés Git
+
+**Précaution** : toujours vérifier le contenu avant exécution :
+
+```bash
+cat scripts/up.sh
+```
+
+## Annexe - Commandes rapides
+
+| Action   | Commande longue            | Script                     |
+| -------- | -------------------------- | -------------------------- |
+| Démarrer | `docker compose ... up -d` | `./scripts/up.sh`          |
+| Arrêter  | `docker compose ... stop`  | `./scripts/down.sh`        |
+| Santé    | `docker compose ps + curl` | `./scripts/healthcheck.sh` |
+| Logs     | `docker compose logs -f`   | `docker compose logs -f`   |
+
+**Fin du runbook**
