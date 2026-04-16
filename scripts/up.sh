@@ -15,8 +15,16 @@ fi
 echo "[INFO] Lancement de la stack Docker Compose"
 docker compose -f "$COMPOSE_FILE" up -d --build
 
-echo "[INFO] Attente de quelques secondes pour l'initialisation"
+echo "[INFO] Attente du conteneur app"
 sleep 5
+
+echo "[INFO] Installation des dépendances PHP via Composer"
+docker compose -f "$COMPOSE_FILE" exec app composer install --no-interaction --prefer-dist
+
+echo "[INFO] Nettoyage des caches Laravel"
+docker compose -f "$COMPOSE_FILE" exec app php artisan config:clear
+docker compose -f "$COMPOSE_FILE" exec app php artisan route:clear
+docker compose -f "$COMPOSE_FILE" exec app php artisan view:clear
 
 echo "[INFO] État Docker Compose"
 docker compose -f "$COMPOSE_FILE" ps
