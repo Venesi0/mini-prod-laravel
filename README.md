@@ -82,6 +82,11 @@ cd mini-prod-laravel
 ./scripts/healthcheck.sh
 ```
 
+[INFO] : L'application web n'est pas encore aboutie, mais si vous voulez vous balader un peu dedans, utilisez les identifiants suivants pour vous connecter :
+
+        - email : admin@projecta.com
+        - mot de passe : admin00
+
 Ce que fait `./scripts/up.sh`
 Le script up.sh prépare un premier lancement reproductible :
 

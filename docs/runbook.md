@@ -127,6 +127,11 @@ cd mini-prod-laravel
 ./scripts/healthcheck.sh
 ```
 
+[INFO] : L'application web n'est pas encore aboutie, mais si vous voulez vous balader un peu dedans, utilisez les identifiants suivants pour vous connecter :
+
+        - email : admin@projecta.com
+        - mot de passe : admin00
+
 Objectif :
 
 - valider un premier lancement reproductible ;
@@ -458,6 +463,11 @@ cd mini-prod-laravel
 ./scripts/up.sh
 ./scripts/healthcheck.sh
 ```
+
+[INFO] : L'application web n'est pas encore aboutie, mais si vous voulez vous balader un peu dedans, utilisez les identifiants suivants pour vous connecter :
+
+        - email : admin@projecta.com
+        - mot de passe : admin00
 
 Résultat attendu :
 
