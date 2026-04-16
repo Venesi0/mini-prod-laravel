@@ -7,12 +7,9 @@ use Illuminate\Database\Seeder;
 
 class CollaboratorSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        Collaborator::insert([
+        Collaborator::upsert([
             [
                 'full_name' => 'Grace Whitman',
                 'email' => 'grace.whitman@example.com',
@@ -83,6 +80,6 @@ class CollaboratorSeeder extends Seeder
                 'rating' => 4.8,
                 'avatar_color' => '#457B9D',
             ],
-        ]);
+        ], ['email']);
     }
 }
