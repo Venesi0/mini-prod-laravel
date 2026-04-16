@@ -59,6 +59,50 @@ scripts/               scripts utilitaires
 - Docker Compose
 - Ubuntu Server
 
+## Pré-requis
+
+Pour lancer le projet depuis un clone, il faut disposer au minimum de :
+
+- Git
+- Docker
+- Docker Compose v2
+
+Sous Windows, le lancement est prévu via Docker Desktop avec WSL2, puis depuis un terminal Ubuntu WSL. Docker Desktop intègre Docker Compose et s’appuie sur le backend WSL2 pour les workflows Linux.
+
+## Démarrage rapide depuis un clone
+
+ATTENTION : Les scripts doivent IMPERATIVEMENT se lancer depuis la racine du projet
+
+Depuis la racine du projet :
+
+```bash
+git clone <repo>
+cd mini-prod-laravel
+./scripts/up.sh
+./scripts/healthcheck.sh
+```
+
+Ce que fait `./scripts/up.sh`
+Le script up.sh prépare un premier lancement reproductible :
+
+- Crée app/laravel/.env à partir de .env.example si nécessaire
+
+- Génère une APP_KEY Laravel
+
+- Aligne la configuration applicative avec les identifiants PostgreSQL attendus par Docker Compose
+
+- Lance la stack Docker Compose
+
+- Installe les dépendances PHP via Composer
+
+- Nettoie les caches Laravel
+
+- Exécute les migrations
+
+- Exécute les seeders
+
+- Affiche les URL d’accès et l’état des services
+
 ## Lancement de la stack
 
 Depuis la racine du projet :
@@ -93,7 +137,7 @@ Arrêt propre :
 ./scripts/down.sh
 ```
 
-Réparation du runtime Laravel en cas d'erreur 500 :
+Réparation en cas d'erreur 500 du au Runtime Laravel :
 
 ```bash
 ./scripts/fix-laravel-runtime.sh
@@ -105,22 +149,62 @@ Remise des permissions locales pour les opérations Git sur la VM :
 ./scripts/fix-git-permissions.sh
 ```
 
-Lancer les migrations :
+Lancer les migrations manuellement :
 
 ```bash
 docker compose -f infra/compose/docker-compose.yml exec app php artisan migrate
 ```
 
-Exécuter les seeders :
+Exécuter les seeders manuellement :
 
 ```bash
 docker compose -f infra/compose/docker-compose.yml exec app php artisan db:seed
 ```
 
+Réinitialiser complètement la base de test :
+
+```bash
+docker compose -f infra/compose/docker-compose.yml exec app php artisan migrate:fresh --seed
+```
+
 ## Accès
 
-- Depuis la VM : `http://localhost`
-- Depuis la machine hôte : selon la configuration réseau VirtualBox, soit via l’IP de la VM, soit via une redirection de port
+L'adresse de l'application vous sera normalement donné lors de l'éxécution de `./script/up.sh`
+
+- Depuis une machine lançant directement Docker Compose : http://localhost
+
+- Depuis la machine hôte d’une VM : selon la configuration réseau VirtualBox, soit via l’IP de la VM, soit via une redirection de port
+
+## Résultat attendu après un clone
+
+Après exécution de `./scripts/up.sh`, on attend :
+
+- Les services nginx, app et db en état Up
+
+- Une réponse HTTP cohérente sur http://localhost
+
+- Une base initialisée
+
+- Un contrôle rapide valide via `./scripts/healthcheck.sh`
+
+- Un accès fonctionnel à l’application et à l’authentification
+
+## Points d’attention
+
+Les scripts doivent IMPERATIVEMENT se lancer depuis la racine du projet.
+
+Le script init-env.sh ne modifie pas un .env déjà présent.
+
+Les identifiants Laravel (DB\_\*) doivent rester cohérents avec les variables PostgreSQL du service db.
+
+PostgreSQL persiste ses données dans un volume Docker ; un ancien volume peut donc conserver un état incohérent avec une nouvelle configuration. La persistance PostgreSQL via volume fait partie de l’architecture retenue.
+
+En cas de reconstruction propre du test local :
+
+```bash
+docker compose -f infra/compose/docker-compose.yml down -v
+./scripts/up.sh
+```
 
 ## Limites actuelles
 

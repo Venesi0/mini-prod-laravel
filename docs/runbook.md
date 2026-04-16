@@ -54,10 +54,13 @@ infra/compose/docker-compose.yml
 
 ## 3. Prérequis d'exploitation
 
+## 3. Prérequis d'exploitation
+
 Avant toute action :
 
-- être connecté en SSH sur la VM Ubuntu Server ;
+- être connecté en SSH sur la VM Ubuntu Server ou disposer d’une machine locale de test ;
 - être placé à la racine du projet ;
+- vérifier que Git est disponible ;
 - vérifier que Docker est disponible ;
 - vérifier que Docker Compose fonctionne.
 
@@ -65,9 +68,14 @@ Commandes de contrôle :
 
 ```bash
 pwd
+git --version
 docker --version
 docker compose version
 ```
+
+Remarque :
+
+Sous Windows, l’usage visé est Docker Desktop avec WSL2, puis lancement depuis un terminal Ubuntu WSL. Docker Desktop fournit Docker Compose et s’intègre au backend WSL2.
 
 ## 4. Lancement de la stack
 
@@ -85,10 +93,17 @@ docker compose -f infra/compose/docker-compose.yml up -d
 
 Le script `up.sh` :
 
+- vérifie la présence de app/laravel/.env ;
+- initialise .env à partir de .env.example si nécessaire ;
+- génère une APP_KEY Laravel ;
+- aligne la configuration Laravel avec les identifiants PostgreSQL attendus par Docker Compose ;
 - lance la stack ;
+- installe les dépendances PHP via Composer ;
+- nettoie les caches Laravel ;
+- exécute les migrations ;
+- exécute les seeders ;
 - affiche l'état des services ;
-- affiche l'URL locale `http://localhost` ;
-- affiche l'URL réseau de la VM si elle est détectée automatiquement.
+- affiche l’état des services et les URL d’accès.
 
 ### Vérification immédiate après démarrage
 
@@ -100,7 +115,23 @@ Résultat attendu :
 
 - les conteneurs principaux sont présents ;
 - les services sont en état `Up` ;
-- aucun conteneur ne redémarre en boucle.
+- aucun conteneur ne redémarre en boucle ;
+- l’application répond sur http://localhost.
+
+TEST DEPUIS UN CLONE GITHUB :
+
+```bash
+git clone <repo>
+cd mini-prod-laravel
+./scripts/up.sh
+./scripts/healthcheck.sh
+```
+
+Objectif :
+
+- valider un premier lancement reproductible ;
+- vérifier que l’application est exploitable après clonage ;
+- confirmer que la base est initialisée et que les dépendances applicatives sont présentes.
 
 ## 5. Arrêt de la stack
 
@@ -346,19 +377,69 @@ docker compose -f infra/compose/docker-compose.yml logs --tail=100 db
 docker compose -f infra/compose/docker-compose.yml exec db pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
 ```
 
+### Cas 5 : incohérence des identifiants PostgreSQL
+
+Symptômes possibles :
+
+- erreur Laravel `SQLSTATE[08006] [7]`
+- `password authentication failed for user`
+- échec des migrations
+- login applicatif en erreur 500 alors que la stack semble démarrée + `./scripts/healthcheck.sh` ok
+
+Hypothèses :
+
+- `DB_PASSWORD` dans `app/laravel/.env` différent de `POSTGRES_PASSWORD` côté service `db`
+- ancien volume PostgreSQL conservant un état incompatible avec une nouvelle configuration
+- environnement applicatif initialisé à partir d’un `.env` déjà présent et non mis à jour
+
+Commandes utiles :
+
+```bash
+docker compose -f infra/compose/docker-compose.yml logs --tail=100 app
+docker compose -f infra/compose/docker-compose.yml logs --tail=100 db
+docker compose -f infra/compose/docker-compose.yml exec app php artisan about
+```
+
+## Remédiation :
+
+- vérifier la cohérence entre les variables DB*\* côté Laravel et les variables POSTGRES*\* côté Compose ;
+
+- corriger app/laravel/.env si nécessaire ;
+
+- en cas de doute sur l’état de la base de test, repartir d’un état propre :
+
+```bash
+docker compose -f infra/compose/docker-compose.yml down -v
+./scripts/up.sh
+```
+
+## Précaution :
+
+PostgreSQL persiste son état dans un volume Docker ; modifier les variables d’environnement après initialisation ne recrée pas automatiquement les identifiants internes de la base.
+
 ## 10. Scripts utilitaires
 
 Les scripts dans `scripts/` simplifient les opérations courantes.
 
 ### Scripts disponibles
 
-| Script                             | Usage              | Action                                                          |
-| ---------------------------------- | ------------------ | --------------------------------------------------------------- |
-| `./scripts/up.sh`                  | Démarrage          | Lance la stack, affiche l'état Compose et les URL d'accès       |
-| `./scripts/down.sh`                | Arrêt              | Stoppe proprement la stack                                      |
-| `./scripts/healthcheck.sh`         | Contrôle           | Vérifie conteneurs, HTTP et PostgreSQL                          |
-| `./scripts/fix-laravel-runtime.sh` | Remédiation        | Répare le runtime Laravel en cas d'erreur 500                   |
-| `./scripts/fix-git-permissions.sh` | Maintenance locale | Redonne la main à l'utilisateur système pour les opérations Git |
+- **`./scripts/up.sh`** — Démarrage / bootstrap  
+  Initialise `.env` si nécessaire, lance la stack, installe Composer, nettoie les caches Laravel, exécute les migrations et seeders, puis affiche l’état Compose et les URL d’accès.
+
+- **`./scripts/down.sh`** — Arrêt  
+  Stoppe proprement la stack.
+
+- **`./scripts/healthcheck.sh`** — Contrôle  
+  Vérifie les conteneurs, la réponse HTTP et PostgreSQL.
+
+- **`./scripts/fix-laravel-runtime.sh`** — Remédiation  
+  Répare le runtime Laravel en cas d’erreur 500 liée à `storage/` ou `bootstrap/cache`.
+
+- **`./scripts/fix-git-permissions.sh`** — Maintenance locale  
+  Redonne la main à l’utilisateur système pour les opérations Git.
+
+- **`./scripts/init-env.sh`** — Initialisation  
+  Crée `app/laravel/.env`, génère `APP_KEY` et aligne les variables applicatives de base avec Docker Compose.
 
 ### Workflow typique après incident Laravel
 
@@ -368,6 +449,22 @@ Les scripts dans `scripts/` simplifient les opérations courantes.
 ./scripts/fix-git-permissions.sh
 git pull --rebase origin main
 ```
+
+### Workflow de validation depuis un clone
+
+```bash
+git clone <repo>
+cd mini-prod-laravel
+./scripts/up.sh
+./scripts/healthcheck.sh
+```
+
+Résultat attendu :
+
+- application accessible ;
+- base initialisée ;
+- contrôles de santé cohérents ;
+- environnement stable.
 
 ## 11. Principes d'exploitation retenus
 
