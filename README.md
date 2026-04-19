@@ -213,10 +213,37 @@ docker compose -f infra/compose/docker-compose.yml down -v
 
 ## Limites actuelles
 
-Cette phase vise un socle d’exploitation simple.
-Le monitoring, l’observabilité, l’automatisation de déploiement et le durcissement plus poussé sont prévus dans les phases suivantes.
+Cette phase 4 constitue un socle d'exploitation stable et documenté.
+À ce stade, le projet ne couvre pas encore :
+
+- l'intégration continue CI
+- les tests automatisés dans un pipeline
+- les quality gates avant mise en production
+- le déploiement automatisé ou semi-automatisé
+- l'observabilité complète avec métriques et tableaux de bord
+- le durcissement plus poussé orienté production
+
+L'objectif des phases suivantes est de rapprocher le projet d'une logique plus crédible de production informatique / DevOps, avec une priorité donnée à l'automatisation, à la qualité de livraison et à l'exploitation observable.
 
 ## Suite prévue
 
-- Phase 5 : monitoring avec Prometheus / Grafana / node_exporter
-- Phase 6 : amélioration de la qualité de déploiement et de la documentation d’exploitation
+- Phase 5 : CI/CD et qualité de livraison
+  - pipeline GitHub Actions
+  - lint / validation de configuration
+  - tests automatisés Laravel
+  - quality gate avant fusion ou déploiement
+  - artefacts et statut d'exécution
+
+- Phase 6 : observabilité et monitoring
+  - Prometheus
+  - Grafana
+  - node_exporter
+  - métriques système, HTTP et base de données
+  - premiers tableaux de bord d'exploitation
+
+- Phase 7 : déploiement et exploitation avancée
+  - déploiement contrôlé depuis GitHub
+  - workflow de mise à jour de la VM
+  - procédures de rollback simples
+  - journalisation et alertes de premier niveau
+  - documentation finale orientée portfolio / entretien

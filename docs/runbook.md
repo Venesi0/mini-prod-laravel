@@ -21,9 +21,11 @@ Ce runbook couvre uniquement l'exploitation courante :
 
 Il ne couvre pas :
 
-- le développement de l'application Laravel ;
-- les évolutions d'architecture ;
-- le monitoring avancé (prévu en phase 5).
+- le développement de l'application Laravel
+- les évolutions d'architecture
+- la chaîne CI/CD à venir après la phase 4
+- l'observabilité avancée prévue dans les phases suivantes
+- le déploiement contrôlé à venir
 
 ## 2. Périmètre et conventions
 
@@ -486,10 +488,61 @@ Résultat attendu :
 
 ## 12. Suite prévue
 
-La phase suivante portera sur l'observabilité et le monitoring :
+La phase 4 a permis de stabiliser l'exploitation courante de la stack.
+La suite du projet est organisée pour se rapprocher d'un mini environnement DevOps crédible, sans remettre en cause la base applicative existante.
 
-- Prometheus ;
-- Grafana ;
-- node_exporter.
+### Phase 5 - CI/CD et qualité de livraison
 
-Cette phase ne sera engagée qu'une fois l'exploitation courante stabilisée et documentée.
+Priorité donnée à l'automatisation des contrôles avant toute évolution d'exploitation avancée.
+
+Objectifs :
+
+- exécuter automatiquement des contrôles à chaque changement
+- détecter plus tôt les erreurs de configuration ou de code
+- formaliser un quality gate minimal avant intégration
+- documenter les échecs et les actions de remédiation associées
+
+Éléments prévus :
+
+- workflow GitHub Actions
+- tests Laravel automatisés
+- lint ou validation de configuration
+- lecture des statuts CI dans GitHub
+- mise à jour du runbook avec procédures de diagnostic CI
+
+### Phase 6 - Observabilité et monitoring
+
+Une fois la chaîne de contrôle en place, ajout d'une couche de supervision.
+
+Objectifs :
+
+- observer l'état de l'hôte et des services
+- accélérer le diagnostic
+- rendre l'exploitation démontrable en entretien
+
+Éléments prévus :
+
+- Prometheus
+- Grafana
+- node_exporter
+- métriques système, HTTP et base de données
+- tableaux de bord de premier niveau
+
+### Phase 7 - Déploiement contrôlé et exploitation avancée
+
+Dernière étape d'industrialisation du projet personnel.
+
+Objectifs :
+
+- standardiser la mise à jour de l'environnement
+- réduire le risque d'erreur manuelle
+- préparer un scénario crédible de démonstration de livraison
+- documenter une remédiation simple après incident de déploiement
+
+Éléments prévus :
+
+- procédure de déploiement documentée
+- déclenchement contrôlé depuis GitHub
+- rollback simple
+- enrichissement du runbook post-déploiement
+- finalisation de la documentation projet

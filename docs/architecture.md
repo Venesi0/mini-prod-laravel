@@ -6,7 +6,7 @@ Mettre à disposition une application Laravel dans un mini environnement de prod
 
 ## Composants cibles
 
-- Nginx : point d’entrée HTTP de l’application
+- Nginx : point d’entrée HTTP de l’application, certificat TLS monté dans le conteneur Nginx
 - PHP-FPM / Laravel : exécution de l’application
 - PostgreSQL : base de données relationnelle
 - Prometheus : collecte de métriques
@@ -101,19 +101,51 @@ Phase 3 terminée :
 
 ## Stabilisation d'exploitation
 
-À l'issue de la phase 4, l'architecture applicative de base (`nginx` / `app` / `db`) est considérée comme stabilisée pour l'exploitation courante :
+À l'issue de la phase 4, l'architecture applicative de base `nginx / app / db` est considérée comme stabilisée pour l'exploitation courante :
 
-- démarrage, arrêt et redémarrage documentés ;
-- contrôles de santé formalisés ;
-- scripts utilitaires d'exploitation ajoutés ;
-- correction structurelle du runtime Laravel intégrée au démarrage du conteneur `app`.
+- démarrage, arrêt et redémarrage documentés
+- contrôles de santé formalisés
+- scripts utilitaires d'exploitation ajoutés
+- correction structurelle du runtime Laravel intégrée au démarrage du conteneur `app`
 
-L'étape suivante n'est pas une refonte de la stack applicative, mais l'ajout de briques d'observabilité.
+La suite du projet ne vise pas à remettre en cause cette base, mais à l'enrichir progressivement selon une logique plus proche d'un environnement DevOps réel :
 
-## Extension prévue
+1. fiabiliser la chaîne de livraison,
+2. rendre l'exploitation observable,
+3. préparer un déploiement contrôlé.
 
-Les composants suivants sont prévus pour la suite mais non implémentés dans cette phase :
+## Extensions prévues après la phase 4
 
-- Prometheus
-- Grafana
-- node_exporter
+### Phase 5 - Chaîne CI/CD
+
+Ajout d'une couche d'intégration continue autour du dépôt GitHub :
+
+- exécution automatique de contrôles sur push / pull request
+- vérification de la qualité minimale avant intégration
+- tests automatisés Laravel
+- validation de la configuration et des scripts critiques
+
+Cette phase complète l'architecture existante sans modifier les composants métier `nginx`, `app` et `db`.
+Elle ajoute une brique de contrôle autour du cycle de changement.
+
+### Phase 6 - Observabilité
+
+Ajout des composants suivants :
+
+- Prometheus : collecte des métriques
+- Grafana : visualisation
+- node_exporter : métriques système de la VM
+
+Cette extension ajoute une couche d'observation de l'infrastructure et des services déjà en place.
+Elle sert l'exploitation, le diagnostic et la démonstration de maturité technique.
+
+### Phase 7 - Déploiement contrôlé et exploitation avancée
+
+Ajout d'une logique de livraison et d'exploitation plus complète :
+
+- déclenchement contrôlé d'une mise à jour
+- standardisation du workflow de déploiement sur la VM
+- possibilité de rollback simple
+- enrichissement des procédures post-déploiement et incident
+
+Cette dernière phase vise à faire passer le projet d'une stack stable et observable à un mini environnement personnel réellement démontrable en contexte entretien / CV / GitHub.

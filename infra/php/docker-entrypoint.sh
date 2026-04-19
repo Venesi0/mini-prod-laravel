@@ -5,10 +5,10 @@ echo "[ENTRYPOINT] Initialisation runtime Laravel..."
 
 # Créer les répertoires runtime s'ils n'existent pas
 mkdir -p storage/framework/cache/data \
-         storage/framework/sessions \
-         storage/framework/views \
-         storage/logs \
-         bootstrap/cache
+            storage/framework/sessions \
+            storage/framework/views \
+            storage/logs \
+            bootstrap/cache
 
 # Permissions pour le processus web (www-data)
 chown -R www-data:www-data storage bootstrap/cache
