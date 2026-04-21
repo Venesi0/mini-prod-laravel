@@ -6,7 +6,7 @@ on:
       - main
       - develop
       - dev
-      - feature/**
+      - 'feature/**'
   pull_request:
     branches:
       - main
@@ -18,17 +18,27 @@ jobs:
     name: Quality checks
     runs-on: ubuntu-latest
 
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           coverage: none
+          extensions: mbstring, pdo, pdo_pgsql, pgsql, xml, ctype, json, tokenizer
 
-      - name: Validate composer.json and composer.lock
+      - name: Show PHP version
+        run: php -v
+
+      - name: Show Composer version
+        run: composer --version
+
+      - name: Validate composer files
         working-directory: app/laravel
         run: composer validate --no-check-publish
 
@@ -36,9 +46,9 @@ jobs:
         working-directory: app/laravel
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      - name: PHP syntax check
-        run: find app/laravel -type f -name "*.php" -print0 | xargs -0 -n1 php -l
+      - name: Lint PHP files
+        run: find app/laravel -type f -name "*.php" -not -path "*/vendor/*" -print0 | xargs -0 -n1 php -l
 
-      - name: Validate Docker Compose configuration
+      - name: Validate Docker Compose file
         working-directory: infra/compose
         run: docker compose config
