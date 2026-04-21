@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - dev
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+      - dev
+
+jobs:
+  quality-checks:
+    name: Quality checks
+    runs-on: ubuntu-latest
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          extensions: mbstring, ctype, json, tokenizer, xml, dom, pdo, pdo_pgsql, pgsql, intl, zip
+
+
+      - name: Show PHP version
+        run: php -v
+
+      - name: Show Composer version
+        run: composer --version
+
+      - name: Validate composer files
+        working-directory: app/laravel
+        run: composer validate --no-check-publish
+
+      - name: Prepare Laravel runtime directories
+        working-directory: app/laravel
+        run: |
+          mkdir -p bootstrap/cache
+          mkdir -p storage/framework/cache/data
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/framework/views
+          mkdir -p storage/logs
+          chmod -R 775 bootstrap/cache storage
+
+      - name: Install Composer dependencies
+        working-directory: app/laravel
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Lint PHP files
+        run: find app/laravel -type f -name "*.php" -not -path "*/vendor/*" -print0 | xargs -0 -n1 php -l
+
+      - name: Validate Docker Compose file
+        working-directory: infra/compose
+        run: docker compose config
