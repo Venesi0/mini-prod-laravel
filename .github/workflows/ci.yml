@@ -43,6 +43,16 @@ jobs:
         working-directory: app/laravel
         run: composer validate --no-check-publish
 
+      - name: Prepare Laravel runtime directories
+        working-directory: app/laravel
+        run: |
+          mkdir -p bootstrap/cache
+          mkdir -p storage/framework/cache/data
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/framework/views
+          mkdir -p storage/logs
+          chmod -R 775 bootstrap/cache storage
+
       - name: Install Composer dependencies
         working-directory: app/laravel
         run: composer install --no-interaction --no-progress --prefer-dist
