@@ -30,7 +30,8 @@ jobs:
         with:
           php-version: '8.2'
           coverage: none
-          extensions: mbstring, pdo, pdo_pgsql, pgsql, xml, ctype, json, tokenizer
+          extensions: mbstring, ctype, json, tokenizer, xml, dom, pdo, pdo_pgsql, pgsql, intl, zip
+
 
       - name: Show PHP version
         run: php -v
