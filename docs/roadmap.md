@@ -45,31 +45,59 @@ Statut : terminé
 - [x] Préparation de la phase 5 monitoring sans implémentation immédiate
 - [ ] Sécurité HTTPS (certificat TLS auto-signé ici)
 
-# Phase 5 - CI/CD et qualité de livraison
+## 🚧 Phase 5 - CI/CD et qualité de livraison
 
-Statut : à faire
+Statut : en cours
 
 Objectif :
-faire évoluer le projet d'une simple stack exploitable vers une chaîne de livraison plus crédible en contexte DevOps.
+faire évoluer le projet d'une simple stack exploitable vers une chaîne d'intégration et de livraison continue plus crédible en contexte DevOps, en s'alignant sur une structure de pipeline de type entreprise.
 
-Contenu prévu :
+### 5.1 - CI socle GitHub Actions
 
-- GitHub Actions pour exécuter les contrôles automatiquement
-- validation de la syntaxe et de la configuration
-- tests Laravel automatisés
-- quality gate avant merge ou déploiement
-- structuration des scripts liés à la CI
-- documentation du workflow de livraison
+- [x] Création du workflow CI versionné dans `.github/workflows/ci.yml`
+- [x] Déclenchement automatique sur `push`
+- [x] Déclenchement automatique sur `pull_request`
+- [x] Validation des fichiers Composer
+- [x] Préparation du runtime Laravel minimal pour la CI
+- [x] Vérification de syntaxe PHP
+- [x] Validation du fichier Docker Compose
+- [x] Statut CI lisible dans GitHub Actions
 
-Livrables attendus :
+### 5.2 - Build Docker dans le pipeline
 
-- workflow CI versionné dans le dépôt
-- exécution automatique sur push / pull request
-- statut lisible dans GitHub
-- documentation des contrôles effectués
-- runbook mis à jour avec la lecture des échecs CI
+- [x] Ajout d'un job dédié au build Docker
+- [x] Construction de l'image applicative dans GitHub Actions
+- [x] Vérification que le build passe sans erreur
+- [x] Génération d'un tag basé sur le commit SHA
+- [x] Mise en place du cache de build GitHub Actions
 
----
+### 5.3 - Tests automatisés simples
+
+- [ ] Ajout d'un test Laravel minimal exécutable en CI
+- [ ] Préparation d'un environnement de test simple
+- [ ] Exécution automatique des tests dans le pipeline
+- [ ] Échec du pipeline si le test échoue
+
+### 5.4 - Scan sécurité des images
+
+- [ ] Intégration de Trivy dans le workflow
+- [ ] Scan de l'image Docker construite par le pipeline
+- [ ] Détection des vulnérabilités critiques
+- [ ] Échec du pipeline si une vulnérabilité critique est détectée
+
+### 5.5 - Livraison / déploiement automatique (bonus)
+
+- [ ] Déclenchement d'une livraison automatique sur merge vers `main`
+- [ ] Mise à jour contrôlée de la VM Ubuntu via SSH
+- [ ] Relance de la stack Docker Compose côté cible
+- [ ] Vérification de santé post-déploiement
+
+### 5.6 - Documentation de la phase
+
+- [ ] Mise à jour du README avec le fonctionnement CI/CD
+- [ ] Mise à jour du runbook avec lecture et diagnostic des échecs CI
+- [ ] Mise à jour de l'architecture si nécessaire
+- [ ] Consolidation finale de la roadmap de phase 5
 
 # Phase 6 - Observabilité et monitoring
 
