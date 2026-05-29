@@ -12,8 +12,14 @@ else
   echo "[INFO] Fichier .env Laravel déjà présent"
 fi
 
+echo "[INFO] Arrêt des conteneurs existant"
+docker compose -f "$COMPOSE_FILE" down
+
+echo "[INFO] Reconstruction de l'image sans cache"
+docker compose -f "$COMPOSE_FILE" build --no-cache
+
 echo "[INFO] Lancement de la stack Docker Compose"
-docker compose -f "$COMPOSE_FILE" up -d --build
+docker compose -f "$COMPOSE_FILE" up -d 
 
 echo "[INFO] Attente de l'initialisation des services"
 sleep 8
